@@ -104,7 +104,7 @@
         <div class="card"><div class="label">AC（同單位）</div><div class="value" id="len-ac">0</div></div>
         <div class="card">
           <div class="label">∠A（可輸入）</div>
-          <input id="angle-a-input" class="angle-input" type="number" min="1" max="89" step="0.1" value="42.5" />
+          <input id="angle-a-input" class="angle-input" type="number" min="1" max="89" step="0.1" value="37" />
           <div class="hint">可輸入 1° 至 89°</div>
         </div>
         <div class="card"><div class="label">∠B（固定）</div><div class="value" id="ang-b">90.0°</div></div>
@@ -120,8 +120,8 @@
     const radius = 10;
 
     const B = { x: 500, y: 380 };
-    const A = { x: 220, y: 380 };
-    const C = { x: 500, y: 120 };
+    const A = { x: 420, y: 380 };
+    const C = { x: 500, y: 320 };
 
     let dragging = null;
     let isEditingAngleA = false;
@@ -139,11 +139,11 @@
     }
 
     function pxToABUnits(px) {
-      return px / 20;
+      return px / 30;
     }
 
     function abUnitsToPx(units) {
-      return units * 20;
+      return units * 30;
     }
 
     function clampAngleA(v) {
@@ -380,7 +380,7 @@
       canvas.addEventListener(evt, () => dragging = null);
     });
 
-    setFromAB(clampAngleA(parseFloat(inputA.value)), dist(A, B));
+    setFromAB(37, abUnitsToPx(4));
     draw();
   </script>
 </body>
