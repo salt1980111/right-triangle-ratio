@@ -124,6 +124,7 @@
     const C = { x: 500, y: 120 };
 
     let dragging = null;
+    let isEditingAngleA = false;
 
     function dist(p1, p2) {
       return Math.hypot(p1.x - p2.x, p1.y - p2.y);
@@ -249,7 +250,7 @@
       document.getElementById('ang-b').textContent = '90.0°';
       document.getElementById('ang-c').textContent = formatDeg(angleC);
 
-      if (document.activeElement !== inputA) {
+      if (!isEditingAngleA && document.activeElement !== inputA) {
         inputA.value = formatNum(angleA);
       }
     }
@@ -321,10 +322,34 @@
       updateReadings();
     }
 
-    inputA.addEventListener('input', () => {
-      const angleA = clampAngleA(parseFloat(inputA.value));
+    inputA.addEventListener('focus', () => {
+      isEditingAngleA = true;
+    });
+
+    inputA.addEventListener('blur', () => {
+      isEditingAngleA = false;
+      const parsed = parseFloat(inputA.value);
+      const angleA = clampAngleA(parsed);
       const ab = dist(A, B);
-      inputA.value = angleA;
+      inputA.value = formatNum(angleA);
+      setFromAB(angleA, ab);
+      draw();
+    });
+
+    inputA.addEventListener('input', () => {
+      const parsed = parseFloat(inputA.value);
+      if (Number.isNaN(parsed)) return;
+      const angleA = clampAngleA(parsed);
+      const ab = dist(A, B);
+      setFromAB(angleA, ab);
+      draw();
+    });
+
+    inputA.addEventListener('change', () => {
+      const parsed = parseFloat(inputA.value);
+      const angleA = clampAngleA(parsed);
+      const ab = dist(A, B);
+      inputA.value = formatNum(angleA);
       setFromAB(angleA, ab);
       draw();
     });
