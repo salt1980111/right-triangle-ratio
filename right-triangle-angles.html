@@ -88,6 +88,28 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .angle-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    .angle-btn {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .angle-step {
+      font-size: 12px;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -105,7 +127,12 @@
         <div class="card">
           <div class="label">∠A（可輸入）</div>
           <input id="angle-a-input" class="angle-input" type="number" min="1" max="89" step="0.1" value="37" />
-          <div class="hint">可輸入 1° 至 89°</div>
+          <div class="angle-controls">
+            <button type="button" class="angle-btn" id="angle-dec" aria-label="減少角A">◀</button>
+            <button type="button" class="angle-btn" id="angle-inc" aria-label="增加角A">▶</button>
+            <span class="angle-step">每次 0.1°</span>
+          </div>
+          <div class="hint">可輸入 1° 至 89°，亦可用箭咀微調</div>
         </div>
         <div class="card"><div class="label">∠B（固定）</div><div class="value" id="ang-b">90.0°</div></div>
         <div class="card"><div class="label">∠C（自動）</div><div class="value" id="ang-c">0°</div></div>
@@ -117,6 +144,8 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const inputA = document.getElementById('angle-a-input');
+    const angleDecBtn = document.getElementById('angle-dec');
+    const angleIncBtn = document.getElementById('angle-inc');
     const radius = 10;
 
     const B = { x: 500, y: 380 };
@@ -149,6 +178,21 @@
     function clampAngleA(v) {
       if (Number.isNaN(v)) return 45;
       return Math.min(89, Math.max(1, v));
+    }
+
+
+    function applyAngleA(angleA) {
+      const safeAngle = clampAngleA(angleA);
+      const ab = dist(A, B);
+      inputA.value = formatNum(safeAngle);
+      setFromAB(safeAngle, ab);
+      draw();
+    }
+
+    function nudgeAngleA(delta) {
+      const current = clampAngleA(parseFloat(inputA.value));
+      const next = Math.round((current + delta) * 10) / 10;
+      applyAngleA(next);
     }
 
     function clampABLength(len) {
@@ -330,10 +374,7 @@
       isEditingAngleA = false;
       const parsed = parseFloat(inputA.value);
       const angleA = clampAngleA(parsed);
-      const ab = dist(A, B);
-      inputA.value = formatNum(angleA);
-      setFromAB(angleA, ab);
-      draw();
+      applyAngleA(angleA);
     });
 
     inputA.addEventListener('input', () => {
@@ -348,11 +389,11 @@
     inputA.addEventListener('change', () => {
       const parsed = parseFloat(inputA.value);
       const angleA = clampAngleA(parsed);
-      const ab = dist(A, B);
-      inputA.value = formatNum(angleA);
-      setFromAB(angleA, ab);
-      draw();
+      applyAngleA(angleA);
     });
+
+    angleDecBtn.addEventListener('click', () => nudgeAngleA(-0.1));
+    angleIncBtn.addEventListener('click', () => nudgeAngleA(0.1));
 
     canvas.addEventListener('mousedown', (e) => {
       const pos = getCanvasPos(e);
